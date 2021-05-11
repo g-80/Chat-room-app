@@ -22,6 +22,6 @@ function signInWithGoogle() {
 }
 
 const firestore = firebase.firestore();
-const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp();
+const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 
 export { auth, signInWithGoogle, firestore, serverTimestamp };
