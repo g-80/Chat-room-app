@@ -1,15 +1,18 @@
 import { auth, firestore, serverTimestamp } from "../firebase/config";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const Chat: React.FC = () => {
   const currentUser = auth.currentUser!;
 
   const messagesRef = firestore.collection("messages");
-  const query = messagesRef.orderBy("createdAt").limit(25);
+  const query = messagesRef.orderBy("createdAt").limitToLast(25);
   const [messages, loading, error] = useCollectionData(query);
 
-  //   console.log(messages);
+  const autoScrollSpan = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    autoScrollSpan.current!.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const [formValue, setFormValue] = useState("");
   async function sendMessage(e: React.FormEvent) {
@@ -18,6 +21,7 @@ const Chat: React.FC = () => {
       text: formValue,
       createdAt: serverTimestamp(),
       uid: currentUser.uid,
+      displayName: currentUser.displayName,
     });
     setFormValue("");
   }
@@ -41,18 +45,20 @@ const Chat: React.FC = () => {
             {messages &&
               messages.map((message) => (
                 <div key={message.id}>
+                  <span>{message.displayName}</span>
                   <div>
                     <p>{message.text}</p>
                   </div>
-                  <p>
+                  <span>
                     {new Date(message.createdAt * 1000).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
-                  </p>
+                  </span>
                 </div>
               ))}
           </div>
+          <span ref={autoScrollSpan}></span>
         </section>
         <section>
           <form onSubmit={sendMessage}>
