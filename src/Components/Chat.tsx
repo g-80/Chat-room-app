@@ -26,30 +26,46 @@ const Chat: React.FC = () => {
     setFormValue("");
   }
 
+  function isMyMessage(userId: string) {
+    return userId === currentUser.uid ? "my-message" : "";
+  }
+
   return (
     <>
-      <header className="App-header">
-        <button onClick={() => auth.signOut()}>Sign out</button>
-        <p>{currentUser.displayName}</p>
+      <header>
+        <button
+          onClick={() => auth.signOut()}
+          className="primary-btn sign-out-btn"
+        >
+          Sign out
+        </button>
+        <p className="header-username">{currentUser.displayName}</p>
         <div>
-          <img alt="user profile" src={currentUser.photoURL!}></img>
+          <img
+            alt="user profile"
+            className="header-user-image"
+            src={currentUser.photoURL!}
+          ></img>
         </div>
       </header>
       <main>
         <section>
-          <div>
+          <div className="messages-container">
             {error && <p>There was something wrong. Please try again.</p>}
             {messages && messages.length === 0 && (
               <p>Send the first message!</p>
             )}
             {messages &&
               messages.map((message) => (
-                <div key={message.id}>
-                  <span>{message.displayName}</span>
-                  <div>
+                <div
+                  key={message.id}
+                  className={`message-container ${isMyMessage(message.uid)}`}
+                >
+                  <span className="message-sender">{message.displayName}</span>
+                  <div className="message-text">
                     <p>{message.text}</p>
                   </div>
-                  <span>
+                  <span className="message-time">
                     {new Date(message.createdAt * 1000).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -66,10 +82,12 @@ const Chat: React.FC = () => {
               type="text"
               value={formValue}
               onChange={(e) => setFormValue(e.target.value)}
+              className="message-input"
             ></input>
             <button
               type="submit"
               disabled={!formValue || formValue.trim() === ""}
+              className="message-send"
             >
               Send
             </button>
